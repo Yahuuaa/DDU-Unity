@@ -29,11 +29,15 @@ public class GridSystem : MonoBehaviour
     public Dictionary<string, GridCell> grids = new Dictionary<string, GridCell>();
     public bool isBuilding = false;
 
+    public int gridMin = -10;
+    public int gridMax = 10;
+    public float cellSize = 2f;
+
     void Start()
     {
-        for (int x = -10; x < 10; x++)
+        for (int x = gridMin; x < gridMax; x++)
         {
-            for (int z = -10; z < 10; z++)
+            for (int z = gridMin; z < gridMax; z++)
             {
                 string gridId = $"{x}_{z}";
                 grids[gridId] = new GridCell(x, z);
@@ -54,21 +58,21 @@ public class GridSystem : MonoBehaviour
                 return;
             }
             Vector3 mousePos = GetMouse3DPos();
-            int gridX = Mathf.FloorToInt(mousePos.x);
-            int gridZ = Mathf.FloorToInt(mousePos.z);
+            int gridX = Mathf.FloorToInt(mousePos.x / cellSize);
+            int gridZ = Mathf.FloorToInt(mousePos.z / cellSize);
 
             if (cellExists(gridX, gridZ))
             {
                 if (!isOccupied(gridX, gridZ))
                 {
-                    buildingShowcase.transform.position = new Vector3(gridX, 0, gridZ);
+                    buildingShowcase.transform.position = new Vector3(gridX * cellSize, 0, gridZ * cellSize);
                     if (Mouse.current.leftButton.wasPressedThisFrame)
                     {
                         createBuilding();
                     }
                 } else
                 {
-                    buildingShowcase.transform.position = new Vector3(gridX, 0, gridZ);
+                    buildingShowcase.transform.position = new Vector3(gridX * cellSize, 0, gridZ * cellSize);
                 }
             }
         }
@@ -111,14 +115,23 @@ public class GridSystem : MonoBehaviour
 
     public void DrawGrid()
     {
-        for (int x = -10; x <= 10; x++)
+        if (gridLines.Count > 0)
+            return;
+
+        for (int x = gridMin; x <= gridMax; x++)
         {
-            CreateLine(new Vector3(x, 0.01f, -10), new Vector3(x, 0.01f, 10));
+            CreateLine(
+                new Vector3(x * cellSize, 0.01f, gridMin * cellSize),
+                new Vector3(x * cellSize, 0.01f, gridMax * cellSize)
+            );
         }
 
-        for (int z = -10; z <= 10; z++)
+        for (int z = gridMin; z <= gridMax; z++)
         {
-            CreateLine(new Vector3(-10, 0.01f, z), new Vector3(10, 0.01f, z));
+            CreateLine(
+                new Vector3(gridMin * cellSize, 0.01f, z * cellSize),
+                new Vector3(gridMax * cellSize, 0.01f, z * cellSize)
+            );
         }
     }
 
@@ -149,17 +162,13 @@ public class GridSystem : MonoBehaviour
         gridLines.Clear();
     }
 
-
-    Vector3 GetMouse3DPos()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-
-        if (groundPlane.Raycast(ray, out float distance))
-        {
-            return ray.GetPoint(distance);
+    Vector3 GetMouse3DPos() { 
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue()); 
+        Plane groundPlane = new Plane(Vector3.up, Vector3.zero); 
+        if (groundPlane.Raycast(ray, out float distance)) 
+        { 
+            return ray.GetPoint(distance); 
         }
-
         return Vector3.zero;
     }
 }
