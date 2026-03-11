@@ -70,7 +70,7 @@ public class GridSystem : MonoBehaviour
         isBuilding = false;
         HideGrid();
 
-        Building model = new Building(build, 0f, 3, ty);
+        Building model = new Building(build, 0f, 3, type);
     }
 
 
