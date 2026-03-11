@@ -26,6 +26,7 @@ public class CitySystem : MonoBehaviour
     public static int addBuilding(Building building)
     {
         int ID = generateID();
+        building.GetModel().GetComponent<BuildingProperties>().ID = ID;
         buildings.Add(ID, building);
         postions.Add(building.GetModel().transform.position, ID);
         return ID;

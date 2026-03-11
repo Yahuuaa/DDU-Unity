@@ -63,9 +63,13 @@ public class GridSystem : MonoBehaviour
         }
     }
 
+    public GameObject cityFolder;
+
     void createBuilding()
     {
         GameObject build = Instantiate(buildingShowcase, buildingShowcase.transform.position, Quaternion.identity);
+        build.transform.parent = cityFolder.transform;
+        build.name = "Build" + Random.Range(11111, 99999);
         Destroy(buildingShowcase);
         isBuilding = false;
         HideGrid();
