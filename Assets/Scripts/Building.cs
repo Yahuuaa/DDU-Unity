@@ -1,22 +1,41 @@
-using System.Collections.Generic;
+using UnityEngine;
 
 public class Building
 {
-    public List<GridCell> fields;
-    public string type;
-    public Dictionary<string, object> properties;
+    public int ID;
+    public string Type;
+    public GameObject Structure;
 
-    public Building(List<GridCell> fields, string type, Dictionary<string, object> properties)
+    public float Income;
+    public float Maintenance;
+    public int Population;
+    public int PopulationLimit;
+    public float Happiness;
+    public float Health;
+
+    public Building(GameObject model, float maintenance, int populationLimit, string type)
     {
-        this.fields = fields;
-        this.type = type;
-        this.properties = properties;
+        Structure = model;
+        Maintenance = maintenance;
+        PopulationLimit = populationLimit;
+        Type = type;
+
+        Income = 0f;
+        Population = 0;
+        Happiness = 50f;
+        Health = 50f;
+
+        ID = CitySystem.addBuilding(this);
     }
 
-    public Building(GridCell field, string type, Dictionary<string, object> properties)
+    public void Delete()
     {
-        this.fields = new List<GridCell> { field };
-        this.type = type;
-        this.properties = properties;
+        UnityEngine.Object.Destroy(Structure);
+        CitySystem.removeBuilding(ID);
+    }
+
+    public GameObject GetModel()
+    {
+        return this.Structure;
     }
 }

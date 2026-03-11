@@ -2,48 +2,17 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using System.Diagnostics;
+using System.ComponentModel;
 
 public class GridSystem : MonoBehaviour
 {
 
     public GameObject buildingShowcase;
-
-    public Dictionary<string, Dictionary<string, object>> buildingTemp =
-    new Dictionary<string, Dictionary<string, object>>
-    {   
-        {
-            "House-1", new Dictionary<string, object>
-            {
-                {"sizeX", 1},
-                {"sizeZ", 1},
-            }
-        },
-        {
-            "Factory-1", new Dictionary<string, object>
-            {
-                {"sizeX", 2},
-                {"sizeZ", 2},
-            }
-        }
-    };
-    public Dictionary<string, GridCell> grids = new Dictionary<string, GridCell>();
     public bool isBuilding = false;
+    public string type;
 
     public int gridMin = -10;
     public int gridMax = 10;
-    public float cellSize = 2f;
-
-    void Start()
-    {
-        for (int x = gridMin; x < gridMax; x++)
-        {
-            for (int z = gridMin; z < gridMax; z++)
-            {
-                string gridId = $"{x}_{z}";
-                grids[gridId] = new GridCell(x, z);
-            }
-        }
-    }
 
     void Update()
     {
@@ -58,24 +27,26 @@ public class GridSystem : MonoBehaviour
                 return;
             }
             Vector3 mousePos = GetMouse3DPos();
-            int gridX = Mathf.FloorToInt(mousePos.x / cellSize);
-            int gridZ = Mathf.FloorToInt(mousePos.z / cellSize);
+            int gridX = Mathf.FloorToInt(mousePos.x * 2f) / 2;
+            int gridZ = Mathf.FloorToInt(mousePos.z * 2f) / 2;
 
-            if (cellExists(gridX, gridZ))
+            if (canBePlaced(gridX, gridZ))
             {
-                if (!isOccupied(gridX, gridZ))
+                buildingShowcase.transform.position = new Vector3(gridX, 0, gridZ);
+                if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    buildingShowcase.transform.position = new Vector3(gridX * cellSize, 0, gridZ * cellSize);
-                    if (Mouse.current.leftButton.wasPressedThisFrame)
-                    {
-                        createBuilding();
-                    }
-                } else
-                {
-                    buildingShowcase.transform.position = new Vector3(gridX * cellSize, 0, gridZ * cellSize);
+                    createBuilding();
                 }
+            } else
+            {
+                buildingShowcase.transform.position = new Vector3(gridX, 0, gridZ);
             }
         }
+    }
+
+    public bool canBePlaced(int x, int y)
+    {
+        return true;
     }
 
     public void spawnBuilding(string buildingName)
@@ -86,6 +57,7 @@ public class GridSystem : MonoBehaviour
         if (!isBuilding)
         {
             isBuilding = true;
+            type = buildingName;
             buildingShowcase = Instantiate(building, new Vector3(0, 0, 0), Quaternion.identity);
             buildingShowcase.SetActive(true);
         }
@@ -93,23 +65,14 @@ public class GridSystem : MonoBehaviour
 
     void createBuilding()
     {
+        GameObject build = Instantiate(buildingShowcase, buildingShowcase.transform.position, Quaternion.identity);
         Destroy(buildingShowcase);
         isBuilding = false;
         HideGrid();
-        //Build
+
+        Building model = new Building(build, 0f, 3, ty);
     }
 
-    bool cellExists(int x, int z)
-    {
-        string gridId = $"{x}_{z}";
-        return grids.ContainsKey(gridId);
-    }
-
-    bool isOccupied(int x, int z)
-    {
-        string gridId = $"{x}_{z}";
-        return grids[gridId].isOccupied;
-    }
 
     private List<GameObject> gridLines = new List<GameObject>();
 
@@ -121,16 +84,16 @@ public class GridSystem : MonoBehaviour
         for (int x = gridMin; x <= gridMax; x++)
         {
             CreateLine(
-                new Vector3(x * cellSize, 0.01f, gridMin * cellSize),
-                new Vector3(x * cellSize, 0.01f, gridMax * cellSize)
+                new Vector3(x, 0, gridMin),
+                new Vector3(x, 0, gridMax)
             );
         }
 
         for (int z = gridMin; z <= gridMax; z++)
         {
             CreateLine(
-                new Vector3(gridMin * cellSize, 0.01f, z * cellSize),
-                new Vector3(gridMax * cellSize, 0.01f, z * cellSize)
+                new Vector3(gridMin, 0, z),
+                new Vector3(gridMax, 0, z)
             );
         }
     }
@@ -147,8 +110,8 @@ public class GridSystem : MonoBehaviour
         lr.startWidth = 0.05f;
         lr.endWidth = 0.05f;
         lr.material = new Material(Shader.Find("Sprites/Default")); 
-        lr.startColor = Color.green;
-        lr.endColor = Color.green;
+        lr.startColor = Color.yellow;
+        lr.endColor = Color.yellow;
 
         gridLines.Add(lineObj);
     }
