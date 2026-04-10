@@ -1,29 +1,64 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class CameraMovement : MonoBehaviour
 {
-    public float mouseSensitivity = 2f;
-    
-    private float yaw = 0f;
-    private float pitch = 0f;
+
+    [Header("Pan")]
+    public float panSpeed = 20f;
+    public float edgeScrollThickness = 20f;
+    public bool useEdgeScrolling = true;
+
+    [Header("Zoom")]
+    public float zoomSpeed = 5f;
+    public float minZoom = 5f;
+    public float maxZoom = 50f;
+
+    [Header("Rotation")]
+    public float rotationSpeed = 100f;
 
     void Update()
     {
-        float moveX = Keyboard.current.dKey.isPressed ? 1f : Keyboard.current.aKey.isPressed ? -1f : 0f;
-        float moveY = Keyboard.current.wKey.isPressed ? 1f : Keyboard.current.sKey.isPressed ? -1f : 0f;
-        
-        Vector3 movement = new Vector3(moveX, moveY, 0) * Time.deltaTime * 5f;
-        Camera.main.transform.Translate(movement);
-        
-        if (Mouse.current.rightButton.isPressed)
+        HandlePan();
+        HandleZoom();
+        HandleRotation();
+    }
+
+    void HandlePan()
+    {
+        Vector3 move = Vector3.zero;
+
+        // WASD / Arrow keys
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))    move += transform.forward;
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))  move -= transform.forward;
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))  move -= transform.right;
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) move += transform.right;
+
+        // Edge scrolling
+        if (useEdgeScrolling)
         {
-            Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-            yaw += mouseDelta.x * mouseSensitivity;
-            pitch -= mouseDelta.y * mouseSensitivity;
-            pitch = Mathf.Clamp(pitch, -90f, 90f);
-            
-            GetComponent<Camera>().transform.localRotation = Quaternion.Euler(pitch, yaw, 0f);
+            Vector3 mousePos = Input.mousePosition;
+            if (mousePos.x < edgeScrollThickness)                    move -= transform.right;
+            if (mousePos.x > Screen.width - edgeScrollThickness)     move += transform.right;
+            if (mousePos.y < edgeScrollThickness)                    move -= transform.forward;
+            if (mousePos.y > Screen.height - edgeScrollThickness)    move += transform.forward;
         }
+
+        move.y = 0;
+        transform.position += move * panSpeed * Time.deltaTime;
+    }
+
+    void HandleZoom()
+    {
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        Vector3 pos = transform.position;
+        pos.y -= scroll * zoomSpeed * 100f * Time.deltaTime;
+        pos.y = Mathf.Clamp(pos.y, minZoom, maxZoom);
+        transform.position = pos;
+    }
+
+    void HandleRotation()
+    {
+        if (Input.GetKey(KeyCode.Q)) transform.Rotate(Vector3.up,  rotationSpeed * Time.deltaTime, Space.World);
+        if (Input.GetKey(KeyCode.E)) transform.Rotate(Vector3.up, -rotationSpeed * Time.deltaTime, Space.World);
     }
 }
