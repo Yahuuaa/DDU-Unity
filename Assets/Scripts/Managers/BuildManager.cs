@@ -13,7 +13,7 @@ public class BuildManager : MonoBehaviour
     private readonly Plane _groundPlane = new Plane(Vector3.up, Vector3.zero);
 
     private float _notificationCooldown = 0.5f;
-    private float _lastNotificationTime = -Mathf.Infinity;
+    private float _lastNotificationTime = 0;
     
     void Start()
     {

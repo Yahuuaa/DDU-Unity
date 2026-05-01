@@ -6,7 +6,7 @@ using UnityEngine;
 public class CitizenManager : MonoBehaviour
 {
     public static Dictionary<Guid, Citizen> Citizens = new Dictionary<Guid, Citizen>();
-    public static float Attraction = 0f;
+    public static List<Guid> JoblessCitizens = new List<Guid>();
     
     private float _baseInterval = 5.5f;
     private float _minInterval = 0.5f;
@@ -14,17 +14,11 @@ public class CitizenManager : MonoBehaviour
 
     private int _minAmount = 1;
     private int _maxAmount = 5;
-
-    private float GetCooldown()
-    {
-        float x = 1.5f;
-        return Mathf.Max(_minInterval, _baseInterval - Mathf.Pow(x, Attraction));
-    }
     
     void Update()
     {
         _timer += Time.deltaTime;
-        if (_timer >= GetCooldown())
+        if (_timer >= GetCooldown()) //Moving
         {
             if (!ResidentManager.IsResidenceAvailable()) return;
             _timer = 0f;
@@ -49,5 +43,20 @@ public class CitizenManager : MonoBehaviour
                 }
             }
         }
+
+        if (_timer % 2 == 0) //Work
+        {
+            // code
+        }
+    }
+
+    public static Citizen GetCitizen(Guid id)
+    {
+        return Citizens.GetValueOrDefault(id);
+    }
+    
+    private float GetCooldown()
+    {
+        return Mathf.Max(_minInterval, _baseInterval - Mathf.Pow(1.5f, CityManager.GetAttraction()));
     }
 }

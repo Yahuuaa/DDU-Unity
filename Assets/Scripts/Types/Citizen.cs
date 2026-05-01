@@ -4,9 +4,8 @@ namespace Library
 {
     public class Citizen
     {
-        private float _income;
         private bool _isWorking;
-        
+        private Guid _workplace;
         private Guid _residence;
         private Guid _id;
         
@@ -14,29 +13,30 @@ namespace Library
         {
             _residence = residence;
             _isWorking = false;
-            _income = 0f;
             _id = Guid.NewGuid();
             
-            ResidentManager.GetResidence(residence).AddResident(this);
+            ResidentManager.GetResidence(residence).AddResident(_id);
             CitizenManager.Citizens.Add(_id, this);
         }
 
         public void Leave()
         {
-            CityManager.income -= _income;
             CitizenManager.Citizens.Remove(_id);
-            ResidentManager.Residence.Remove(_residence);
+            ResidentManager.GetResidence(_residence).RemoveResident(_id);
+            if (_isWorking) WorkManager.GetWorkplace(_workplace).RemoveWorker(_id);
         }
 
-        public void ChangeIncome(float income)
+        public void SetWorking(bool work)
         {
-            _income += income;
-            CityManager.income += income;
-        }
-
-        public float GetIncome()
-        {
-            return _income;
+            _isWorking = work;
+            if (work)
+            {
+                CitizenManager.JoblessCitizens.Remove(_id);
+            }
+            else
+            {
+                CitizenManager.JoblessCitizens.Add(_residence);
+            }
         }
 
         public bool IsWorking()

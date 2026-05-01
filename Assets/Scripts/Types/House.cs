@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -7,26 +8,26 @@ namespace Library
     public class House : Building
     {
         private int _populationLimit = 3;
-        private List<Citizen> _citizens;
+        private List<Guid> _citizens;
         
         public House(GameObject model) : base(model)
         {
             ResidentManager.Residence.Add(GetID(), this);
             ResidentManager.AvailableResidence.Add(GetID());
-            _citizens = new List<Citizen>();
+            _citizens = new List<Guid>();
         }
 
         public void Destroy()
         {
-            foreach (Citizen citizen in _citizens)
+            foreach (Guid citizen in _citizens)
             {
-                citizen.Leave();
+                CitizenManager.GetCitizen(citizen).Leave();
             }
             ResidentManager.Residence.Remove(GetID());
             Object.Destroy(GetModel());
         }
 
-        public void AddResident(Citizen citizen)
+        public void AddResident(Guid citizen)
         {
             _citizens.Add(citizen);
             if (_citizens.Count == _populationLimit)
@@ -35,7 +36,7 @@ namespace Library
             }
         }
 
-        public void RemoveResident(Citizen citizen)
+        public void RemoveResident(Guid citizen)
         {
             _citizens.Remove(citizen);
             if (_citizens.Count == _populationLimit)
