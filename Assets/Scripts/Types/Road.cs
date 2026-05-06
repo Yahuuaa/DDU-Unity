@@ -38,6 +38,27 @@ namespace Library
             network.AddRoad(GetID());
             SetRoadNetwork(network.GetId());
         }
+        
+        public void SetShape(RoadShape shape, Quaternion rotation)
+        {
+            GameObject model = GetModel();
+            Vector3 pos = GetModel().transform.position;
+
+            GameObject prefab = shape switch
+            {
+                RoadShape.Turn      => RoadManager.instance.turnRoad,
+                RoadShape.TJunction => RoadManager.instance.tshapeRoad,
+                RoadShape.Cross     => RoadManager.instance.crossRoad,
+                _                   => RoadManager.instance.straightRoad 
+            };
+
+            Object.Destroy(model);
+            model = Object.Instantiate(prefab, pos, rotation);
+            model.SetActive(true);
+
+            Variables.Object(model).Set("type", "Road");
+            Variables.Object(model).Set("id", GetID().ToString());
+        }
 
         public void SetRoadNetwork(Guid roadNetwork)
         {

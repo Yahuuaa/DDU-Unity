@@ -9,8 +9,7 @@ namespace Library
         private List<Guid> _roads;
         private List<GameObject> _lines;
         private Guid _id;
-
-
+        
         public RoadNetwork()
         {
             _id = Guid.NewGuid();
@@ -25,8 +24,8 @@ namespace Library
             foreach (var road in roadNetwork.GetRoads())
             {
                 RoadManager.Roads.GetValueOrDefault(road).SetRoadNetwork(_id);
+                AddRoad(road);
             }
-            _roads.AddRange(roadNetwork.GetRoads());
             roadNetwork.Destroy();
         }
 
@@ -35,14 +34,25 @@ namespace Library
             RoadManager.RemoveNetwork(this);
         }
 
+        public void RefreshRoadShapes()
+        {
+            foreach (var roadGuid in _roads)
+            {
+                Road road = RoadManager.Roads.GetValueOrDefault(roadGuid);
+                if (road != null) RoadShapeResolver.UpdateShape(road, RoadManager.Roads);
+            }
+        }
+
         public void AddRoad(Guid road)
         {
             _roads.Add(road);
+            RefreshRoadShapes();
         }
 
         public void RemoveRoad(Guid road)
         {
             _roads.Remove(road);
+            RefreshRoadShapes();
         }
 
         public List<Guid> GetRoads()
