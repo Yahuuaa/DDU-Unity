@@ -10,13 +10,14 @@ namespace Library
         private GameObject _model;
 
         private float _maintenance;
-        private float _earnings;
         
-        public Building(GameObject model)
+        public Building(GameObject model, float maintenance)
         {
             _model = model;
             _id = Guid.NewGuid();
+            _maintenance = maintenance;
             
+            CityManager.Maintanence += maintenance;
             Variables.Object(_model).Set("id", _id.ToString());
         }
 
@@ -28,6 +29,11 @@ namespace Library
         public GameObject GetModel()
         {
             return _model;
+        }
+        
+        public float GetMaintenance()
+        {
+            return _maintenance;
         }
     }
 }

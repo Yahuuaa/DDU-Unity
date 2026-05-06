@@ -10,7 +10,7 @@ namespace Library
     {
         private Guid _roadNetwork;
 
-        public Road(GameObject model) : base(model)
+        public Road(GameObject model) : base(model, 0)
         {
             RoadManager.Roads.Add(GetID(), this);
             
@@ -26,7 +26,7 @@ namespace Library
             foreach (Collider hit in hits)
             {
                 if (hit.transform.IsChildOf(model.transform)) continue;
-                if (Variables.Object(hit.gameObject).Get<string>("type") == "Road")
+                if (Variables.Object(hit.gameObject).IsDefined("type") && Variables.Object(hit.gameObject).Get<string>("type") == "Road")
                 {
                     RoadManager.CheckMergeability(this, Guid.Parse(Variables.Object(hit.gameObject).Get<string>("id")));
                 }
@@ -54,6 +54,7 @@ namespace Library
             RoadManager.Roads.Remove(GetID());
             RoadManager.RoadNetworks.GetValueOrDefault(_roadNetwork).RemoveRoad(GetID());
             Object.Destroy(GetModel());
+            CityManager.Maintanence -= GetMaintenance();
         }
         
         public Guid GetRoadNetwork()

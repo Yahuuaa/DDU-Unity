@@ -12,17 +12,42 @@ namespace Library
         private int _workerLimit = 5;
         private List<Guid> _workers;
         
-        public Factory(GameObject model) : base(model)
+        private GameObject _spriteRenderer;
+
+        public Factory(GameObject model) : base(model, 100)
         {
             _workers = new List<Guid>();
             
             WorkManager.Workplaces.Add(GetID(), this);
             WorkManager.AvailableWorkplaces.Add(GetID());
+            
+            _spriteRenderer = model.transform.Find("Sprite Renderer").gameObject;
+
         }
 
         public void Destroy()
         {
-            //code
+            foreach (Guid id in _workers)
+            {
+                RemoveWorker(id);
+            }
+            UnityEngine.Object.Destroy(GetModel());
+            CityManager.Maintanence -= GetMaintenance();
+        }
+        
+        public void UpdateRoadIcon(bool showing)
+        {
+            _spriteRenderer.SetActive(showing);
+        }
+
+        public List<Guid> GetWorkers()
+        {
+            return _workers;
+        }
+
+        public int GetWorkerLimit()
+        {
+            return _workerLimit;
         }
 
         public void RemoveWorker(Guid citizen)
@@ -31,6 +56,7 @@ namespace Library
             _income -= IncomeWorkerAddition;
             CitizenManager.GetCitizen(citizen).SetWorking(false);
             if (!WorkManager.AvailableWorkplaces.Contains(GetID())) WorkManager.AvailableWorkplaces.Add(GetID());
+            CityManager.Income -= IncomeWorkerAddition;
         }
 
         public void AddWorker(Guid citizen)
@@ -42,6 +68,7 @@ namespace Library
             {
                 WorkManager.AvailableWorkplaces.Remove(GetID());
             }
+            CityManager.Income += IncomeWorkerAddition;
         }
 
         public float GetIncome()

@@ -7,7 +7,6 @@ namespace Library
     public class RoadNetwork
     {
         private List<Guid> _roads;
-        private List<Guid> _houses;
         private List<GameObject> _lines;
         private Guid _id;
 
@@ -16,7 +15,6 @@ namespace Library
         {
             _id = Guid.NewGuid();
             _roads = new List<Guid>();
-            _houses = new List<Guid>();
             _lines = new List<GameObject>();
             
             RoadManager.RoadNetworks.Add(_id, this);
@@ -24,17 +22,11 @@ namespace Library
 
         public void Merge(RoadNetwork roadNetwork)
         {
-            foreach (var road in _roads)
+            foreach (var road in roadNetwork.GetRoads())
             {
                 RoadManager.Roads.GetValueOrDefault(road).SetRoadNetwork(_id);
             }
-
-            //foreach (var road in _roads)
-            //{
-            //    ResidentManager.Residents.GetValueOrDefault(road).SetRoadNetwork(_id);
-            //}
             _roads.AddRange(roadNetwork.GetRoads());
-            _houses.AddRange(roadNetwork.GetHouses());
             roadNetwork.Destroy();
         }
 
@@ -53,24 +45,9 @@ namespace Library
             _roads.Remove(road);
         }
 
-        public void AddHouse(Guid house)
-        {
-            _houses.Add(house);
-        }
-
-        public void RemoveHouse(Guid house)
-        {
-            _houses.Remove(house);
-        }
-
         public List<Guid> GetRoads()
         {
             return _roads;
-        }
-
-        public List<Guid> GetHouses()
-        {
-            return _houses;
         }
 
         public Guid GetId()

@@ -12,7 +12,7 @@ public class BuildManager : MonoBehaviour
     private Camera _camera;
     private readonly Plane _groundPlane = new Plane(Vector3.up, Vector3.zero);
 
-    private float _notificationCooldown = 0.5f;
+    private float _notificationCooldown = 0.5f; 
     private float _lastNotificationTime = 0;
     
     void Start()
@@ -40,6 +40,15 @@ public class BuildManager : MonoBehaviour
             {
                 if (_showcase.CanBePlaced())
                 {
+                    if (!_showcase.CanAfford())
+                    {
+                        if (Time.time >= _lastNotificationTime + _notificationCooldown)
+                        {
+                            NotificationManager.createMessage("Utilstrækkelig Midler", "Der er ikke nok penge til bygningen", new Color(255, 23, 0));
+                            _lastNotificationTime = Time.time;
+                        }
+                        return;
+                    }
                     _showcase.PlaceShowcase();
                     _grid.HideGrid();
                     buildIcon.SetActive(true);

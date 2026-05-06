@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Library;
 using UnityEngine;
 
@@ -24,22 +25,30 @@ public class CitizenManager : MonoBehaviour
             _timer = 0f;
             int amount = UnityEngine.Random.Range(_minAmount, _maxAmount);
             
-            foreach (Guid id in ResidentManager.AvailableResidence)
+            foreach (Guid id in ResidentManager.AvailableResidence.ToList())
             {
                 House house = ResidentManager.GetResidence(id);
-                if (house.GetPopulationLimit() - house.GetPopulation() >= amount)
+                if (RoadManager.IsConnectedToHighway(house.GetModel()))
                 {
-                    for (int i = 0; i < amount; i++)
+                    house.UpdateRoadIcon(false);
+                    if (house.GetPopulationLimit() - house.GetPopulation() >= amount)
+                    {
+                        for (int i = 0; i < amount; i++)
+                        {
+                            new Citizen(house.GetID());
+                        }
+                        return;
+                    }
+
+                    amount -= house.GetPopulationLimit() - house.GetPopulation();
+                    for (int i = 0; i < house.GetPopulationLimit() - house.GetPopulation(); i++)
                     {
                         new Citizen(house.GetID());
                     }
-
-                    return;
                 }
-                amount -= house.GetPopulationLimit() - house.GetPopulation();
-                for (int i = 0; i < house.GetPopulationLimit() - house.GetPopulation(); i++)
+                else
                 {
-                    new Citizen(house.GetID());
+                    house.UpdateRoadIcon(true);
                 }
             }
         }
@@ -57,6 +66,6 @@ public class CitizenManager : MonoBehaviour
     
     private float GetCooldown()
     {
-        return Mathf.Max(_minInterval, _baseInterval - Mathf.Pow(1.5f, CityManager.GetAttraction()));
+        return Mathf.Max(_minInterval, _baseInterval - Mathf.Pow(1.5f, CityManager.Attraction));
     }
 }

@@ -17,6 +17,12 @@ namespace Library
             
             ResidentManager.GetResidence(residence).AddResident(_id);
             CitizenManager.Citizens.Add(_id, this);
+            CitizenManager.JoblessCitizens.Add(_id);
+        }
+
+        public Guid GetID()
+        {
+            return _id;
         }
 
         public void Leave()

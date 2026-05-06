@@ -10,11 +10,20 @@ namespace Library
         private int _populationLimit = 3;
         private List<Guid> _citizens;
         
-        public House(GameObject model) : base(model)
+        private GameObject _spriteRenderer;
+        
+        public House(GameObject model) : base(model, 50)
         {
             ResidentManager.Residence.Add(GetID(), this);
             ResidentManager.AvailableResidence.Add(GetID());
             _citizens = new List<Guid>();
+
+            _spriteRenderer = model.transform.Find("Sprite Renderer").gameObject;
+        }
+
+        public void UpdateRoadIcon(bool showing)
+        {
+            _spriteRenderer.SetActive(showing);
         }
 
         public void Destroy()
@@ -25,6 +34,7 @@ namespace Library
             }
             ResidentManager.Residence.Remove(GetID());
             Object.Destroy(GetModel());
+            CityManager.Maintanence -= GetMaintenance();
         }
 
         public void AddResident(Guid citizen)
