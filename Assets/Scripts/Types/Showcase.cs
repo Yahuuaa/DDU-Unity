@@ -100,7 +100,7 @@ namespace Library
         public bool CanBePlaced()
         {
             BoxCollider box = _model.GetComponent<BoxCollider>();
-            float shrink = 0.05f;
+            float shrink = 0.20f;
 
             Vector3 worldCenter = _model.transform.TransformPoint(box.center);
             Vector3 halfExtents = Vector3.Scale(box.size / 2f, _model.transform.lossyScale) - new Vector3(shrink, shrink, shrink);
@@ -145,7 +145,7 @@ namespace Library
             }
             else if (type == "Hospital")
             {
-                //Building building = new Hospital(build);
+                //new Hospital(build);
             }
             _model.SetActive(false);
         }

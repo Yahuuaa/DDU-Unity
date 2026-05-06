@@ -25,7 +25,12 @@ namespace Library
         {
             return _id;
         }
-
+        
+        public void SetModel(GameObject model)
+        {
+            _model = model;
+        }
+        
         public GameObject GetModel()
         {
             return _model;

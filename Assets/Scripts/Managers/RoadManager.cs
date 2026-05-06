@@ -10,30 +10,13 @@ public class RoadManager : MonoBehaviour
     public static Dictionary<Guid, Road> Roads = new Dictionary<Guid, Road>();
     public static Dictionary<Guid, RoadNetwork> RoadNetworks = new Dictionary<Guid, RoadNetwork>();
 
-    public GameObject turnRoad;
-    public GameObject tshapeRoad;
-    public GameObject crossRoad;
-    public GameObject straightRoad;
-
     public GameObject highwayRoad;
     public static Guid highwayRoadId;
-
-    public static RoadManager instance;
     
     void Start()
     {
-        instance = this;
-        
         Road road = new Road(highwayRoad);
         highwayRoadId = road.GetID();
-    }
-    
-    void Update() //Temporary
-    {
-        foreach (RoadNetwork network in RoadNetworks.Values)
-        {
-            network.HighlightSystem();
-        }
     }
 
     public static bool IsConnectedToHighway(GameObject model)

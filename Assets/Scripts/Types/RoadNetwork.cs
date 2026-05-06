@@ -34,25 +34,14 @@ namespace Library
             RoadManager.RemoveNetwork(this);
         }
 
-        public void RefreshRoadShapes()
-        {
-            foreach (var roadGuid in _roads)
-            {
-                Road road = RoadManager.Roads.GetValueOrDefault(roadGuid);
-                if (road != null) RoadShapeResolver.UpdateShape(road, RoadManager.Roads);
-            }
-        }
-
         public void AddRoad(Guid road)
         {
             _roads.Add(road);
-            RefreshRoadShapes();
         }
 
         public void RemoveRoad(Guid road)
         {
             _roads.Remove(road);
-            RefreshRoadShapes();
         }
 
         public List<Guid> GetRoads()
@@ -63,71 +52,6 @@ namespace Library
         public Guid GetId()
         {
             return _id;
-        }
-
-
-        //Temporary//
-        public void HighlightSystem()
-        {
-            ClearHighlight();
-            
-            List<Road> roads = new List<Road>();
-            foreach (var roadGuid in _roads)
-            {
-                Road road = RoadManager.Roads.GetValueOrDefault(roadGuid);
-                if (road != null) roads.Add(road);
-            }
-
-            for (int i = 0; i < roads.Count; i++)
-            {
-                float closestDist = float.MaxValue;
-                Road closestRoad = null;
-                Vector3 posA = roads[i].GetModel().transform.position + Vector3.up * 1f;
-
-                for (int j = 0; j < roads.Count; j++)
-                {
-                    if (i == j) continue;
-                    Vector3 posB = roads[j].GetModel().transform.position + Vector3.up * 1f;
-                    float dist = Vector3.Distance(posA, posB);
-                    if (dist < closestDist)
-                    {
-                        closestDist = dist;
-                        closestRoad = roads[j];
-                    }
-                }
-
-                if (closestRoad != null)
-                {
-                    CreateLine(posA, closestRoad.GetModel().transform.position + Vector3.up * 1f);
-                }
-            }
-        }
-
-        private void CreateLine(Vector3 start, Vector3 end)
-        {
-            GameObject lineObj = new GameObject("NetworkLine_" + _lines.Count);
-            
-            LineRenderer lr = lineObj.AddComponent<LineRenderer>();
-            lr.positionCount = 2;
-            lr.SetPosition(0, start);
-            lr.SetPosition(1, end);
-            lr.startWidth = 0.05f;
-            lr.endWidth = 0.05f;
-            lr.material = new Material(Shader.Find("Sprites/Default"));
-            lr.startColor = Color.green;
-            lr.endColor = Color.green;
-
-            _lines.Add(lineObj);
-        }
-
-        public void ClearHighlight()
-        {
-            foreach (GameObject line in _lines)
-            {
-                UnityEngine.Object.Destroy(line);
-            }
-
-            _lines.Clear();
         }
     }
 }
