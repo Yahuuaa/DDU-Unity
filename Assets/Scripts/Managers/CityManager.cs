@@ -5,7 +5,7 @@ using Utils;
 
 public class CityManager : MonoBehaviour
 {
-    public static float Money = 100000f;
+    public static float Money = 50000f;
     public static float Maintanence = 0f;
     public static float Income = 0f;
     public static float Attraction = 100f;

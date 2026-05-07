@@ -18,7 +18,7 @@ public class RoadManager : MonoBehaviour
         Road road = new Road(highwayRoad);
         highwayRoadId = road.GetID();
     }
-
+    
     public static bool IsConnectedToHighway(GameObject model)
     {
         BoxCollider box = model.GetComponent<BoxCollider>();

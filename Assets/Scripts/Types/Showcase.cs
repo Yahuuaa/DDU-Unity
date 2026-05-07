@@ -113,7 +113,7 @@ namespace Library
             foreach (Collider hit in hits)
             {
                 if (hit.transform.IsChildOf(_model.transform)) continue;
-                return false;
+                if (Variables.Object(hit.gameObject).IsDefined("id")) return false;
             }
             return true;
         }
