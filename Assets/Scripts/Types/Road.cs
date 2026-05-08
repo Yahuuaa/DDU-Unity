@@ -16,7 +16,7 @@ namespace Library
             
             BoxCollider box = model.GetComponent<BoxCollider>();
             Vector3 worldSize = Vector3.Scale(box.size, model.transform.lossyScale);
-            float expand = 0.1f;
+            float expand = 0.5f;
             Vector3 worldCenter = model.transform.TransformPoint(box.center);
 
             Collider[] hits = Physics.OverlapBox(
@@ -30,6 +30,7 @@ namespace Library
                 if (hit.transform.IsChildOf(model.transform)) continue;
                 if (Variables.Object(hit.gameObject).IsDefined("type") && Variables.Object(hit.gameObject).Get<string>("type") == "Road")
                 {
+                    if (Variables.Object(hit.gameObject).Get<string>("id") == null) continue;
                     RoadManager.CheckMergeability(this, Guid.Parse(Variables.Object(hit.gameObject).Get<string>("id")));
                 }
             }

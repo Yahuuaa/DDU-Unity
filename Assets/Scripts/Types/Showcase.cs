@@ -1,5 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Library
 {
@@ -9,11 +10,10 @@ namespace Library
         private Vector3 _position;
         private BuildType _type;
 
-        private float _offsetX = 0f;
-        private float _offsetZ = 0f;
-
         private float _originX;
         private float _originZ;
+
+        private float _tempX;
 
         private float _price = 0f;
         
@@ -34,21 +34,9 @@ namespace Library
                 _price = 100000f;
             }
             
-            RecalculateOffset();
             _model.SetActive(false);
         }
-
-        private void RecalculateOffset()
-        {
-            BoxCollider box = _model.GetComponent<BoxCollider>();
-            Vector3 worldSize = Vector3.Scale(box.size, _model.transform.lossyScale);
-
-            int sizeX = Mathf.RoundToInt(worldSize.x);
-            int sizeZ = Mathf.RoundToInt(worldSize.z);
-            
-            _offsetX = (sizeX % 2 == 1) ? 0.5f : 0f;
-            _offsetZ = (sizeZ % 2 == 1) ? 0.5f : 0f;
-        }
+        
 
         public void SetVisible(bool visible)
         {
@@ -63,18 +51,27 @@ namespace Library
 
         public void Move(int x, int z)
         {
-            _position.x = x + _offsetX + _originX;
-            _position.z = z + _offsetZ + _originZ;
+            _position.x = x + _originX + _tempX;
+            _position.z = z + _originZ;
             _model.transform.position = _position;
         }
         
         public void Rotate()
         {
-            _model.transform.Rotate(0,0,90);
-            (_offsetX, _offsetZ) = (_offsetZ, _offsetX);
+            _model.transform.Rotate(0, 90,0, Space.World);
             float tempX = _originX;
-            _originX = _originZ;
-            _originZ = -tempX;
+            _originX = -_originZ;
+            _originZ = tempX;
+            
+            if (Variables.Object(_model).IsDefined("rotationOffset") &&
+                ((int)_model.transform.eulerAngles.y == 0 || (int)_model.transform.eulerAngles.y == 180))
+            {
+                _tempX = 0.38f;
+            }
+            else
+            {
+                _tempX = 0f;
+            }
         }
 
         public void ChangeModel(GameObject model)
@@ -83,9 +80,9 @@ namespace Library
             _model = Object.Instantiate(model, model.transform.position, model.transform.rotation);
             _model.transform.name = "showcase";
             _position = _model.transform.position;
-            _originX = _position.x;
-            _originZ = _position.z;
-            RecalculateOffset();
+            _originX = model.transform.position.x;
+            _originZ = model.transform.position.z;
+            _tempX = 0;
 
             if (Variables.Object(model).IsDefined("price"))
             {
@@ -100,7 +97,7 @@ namespace Library
         public bool CanBePlaced()
         {
             BoxCollider box = _model.GetComponent<BoxCollider>();
-            float shrink = 0.20f;
+            float shrink = 0.55f;
 
             Vector3 worldCenter = _model.transform.TransformPoint(box.center);
             Vector3 halfExtents = Vector3.Scale(box.size / 2f, _model.transform.lossyScale) - new Vector3(shrink, shrink, shrink);
@@ -126,9 +123,7 @@ namespace Library
         public void PlaceShowcase()
         {
             CityManager.Money -= _price;
-            _model.SetActive(false);
             GameObject build = Object.Instantiate(_model, _model.transform.position, _model.transform.rotation);
-            build.SetActive(true);
             string type = Variables.Object(_model).Get<string>("type");
             
             if (type == "House")
@@ -147,7 +142,6 @@ namespace Library
             {
                 //new Hospital(build);
             }
-            _model.SetActive(false);
         }
     }
 }

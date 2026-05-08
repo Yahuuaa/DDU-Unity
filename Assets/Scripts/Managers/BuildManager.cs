@@ -49,10 +49,12 @@ public class BuildManager : MonoBehaviour
                         }
                         return;
                     }
+
+                    if (Time.time < _lastNotificationTime + _notificationCooldown) return;
+                    _lastNotificationTime = Time.time;
                     _showcase.PlaceShowcase();
-                    _grid.HideGrid();
-                    buildIcon.SetActive(true);
-                }
+                    return;
+                } 
                 else
                 {
                     if (Time.time >= _lastNotificationTime + _notificationCooldown)
