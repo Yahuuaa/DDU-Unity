@@ -3,17 +3,13 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
 
-    [Header("Pan")]
     public float panSpeed = 20f;
-    public float edgeScrollThickness = 20f;
-    public bool useEdgeScrolling = true;
+    public float scrollThickness = 20f;
 
-    [Header("Zoom")]
     public float zoomSpeed = 5f;
     public float minZoom = 5f;
     public float maxZoom = 50f;
 
-    [Header("Rotation")]
     public float rotationSpeed = 100f;
 
     void Update()
@@ -27,22 +23,17 @@ public class CameraMovement : MonoBehaviour
     {
         Vector3 move = Vector3.zero;
 
-        // WASD / Arrow keys
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))    move += transform.forward;
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))  move -= transform.forward;
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))  move -= transform.right;
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) move += transform.right;
-
-        // Edge scrolling
-        if (useEdgeScrolling)
-        {
-            Vector3 mousePos = Input.mousePosition;
-            if (mousePos.x < edgeScrollThickness)                    move -= transform.right;
-            if (mousePos.x > Screen.width - edgeScrollThickness)     move += transform.right;
-            if (mousePos.y < edgeScrollThickness)                    move -= transform.forward;
-            if (mousePos.y > Screen.height - edgeScrollThickness)    move += transform.forward;
-        }
-
+        
+        Vector3 mousePos = Input.mousePosition;
+        if (mousePos.x < scrollThickness)                    move -= transform.right;
+        if (mousePos.x > Screen.width - scrollThickness)     move += transform.right;
+        if (mousePos.y < scrollThickness)                    move -= transform.forward;
+        if (mousePos.y > Screen.height - scrollThickness)    move += transform.forward;
+        
         move.y = 0;
         transform.position += move * panSpeed * Time.deltaTime;
     }

@@ -22,7 +22,6 @@ namespace Library
             WorkManager.AvailableWorkplaces.Add(GetID());
             
             _spriteRenderer = model.transform.Find("Sprite Renderer").gameObject;
-
         }
 
         public void Destroy()
