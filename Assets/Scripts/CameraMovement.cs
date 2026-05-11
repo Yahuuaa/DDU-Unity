@@ -52,4 +52,4 @@ public class CameraMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.Q)) transform.Rotate(Vector3.up,  -rotationSpeed * Time.deltaTime, Space.World);
         if (Input.GetKey(KeyCode.E)) transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
     }
-}
+}   
